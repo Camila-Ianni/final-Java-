@@ -1,0 +1,196 @@
+package pepe;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class QuienEsQuienFinal {
+
+    static String[] personajes = {
+            "Trump", "Iron Man", "Capitán América", "Shrek", "Gokú", "Putin"
+    };
+
+    static String[] preguntas = {
+            "¿Es un personaje ficticio?",
+            "¿Es superhéroe?",
+            "¿Tiene poderes?",
+            "¿Es presidente?",
+            "¿Tiene cabello rubio?"
+    };
+
+    static String[][] caracteristicas = {
+            {"no", "no", "no", "si", "si"},     // Trump
+            {"si", "si", "no", "no", "no"},     // Iron Man
+            {"si", "si", "si", "no", "si"},     // Capitán América
+            {"si", "no", "si", "no", "no"},     // Shrek
+            {"si", "no", "si", "no", "no"},     // Gokú
+            {"no", "no", "no", "si", "no"}      // Putin
+    };
+
+    static int aciertos = 0;
+
+    public static void main(String[] args) {
+        boolean salir = false;
+
+        do {
+            String opcionStr = JOptionPane.showInputDialog(
+                    "=== ¿QUIÉN ES QUIÉN? ===\n"
+                            + "1. Ver reglas\n"
+                            + "2. Jugar\n"
+                            + "3. Salir\n"
+                            + "\nElegí una opción:");
+
+            if (opcionStr == null) break; // Cancelar sale del juego
+            int opcion;
+            try {
+                opcion = Integer.parseInt(opcionStr);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Ingresá un número válido.");
+                continue;
+            }
+
+            switch (opcion) {
+                case 1:
+                    mostrarReglas();
+                    break;
+                case 2:
+                    jugar();
+                    break;
+                case 3:
+                    salir = true;
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Opción no válida.");
+            }
+        } while (!salir);
+
+        JOptionPane.showMessageDialog(null, "Gracias por jugar. Aciertos totales: " + aciertos);
+    }
+
+    public static void mostrarReglas() {
+        JOptionPane.showMessageDialog(null,
+                "REGLAS DEL JUEGO:\n"
+                        + "- Se elige un personaje secreto entre 6.\n"
+                        + "- Podés hacer hasta 3 preguntas para adivinarlo.\n"
+                        + "- Podés volver a ver la imagen si te olvidás.\n"
+                        + "- Luego hacés tu intento final para adivinar.\n"
+                        + "- Si acertás, sumás un punto.\n");
+        mostrarImagen();
+    }
+
+    public static void jugar() {
+        int personajeElegido = (int) (Math.random() * personajes.length);
+        boolean[] posibles = new boolean[personajes.length];
+        for (int i = 0; i < posibles.length; i++) posibles[i] = true;
+
+        boolean[] preguntasUsadas = new boolean[preguntas.length];
+        int preguntasHechas = 0;
+
+        mostrarImagen();
+
+        do {
+            StringBuilder opciones = new StringBuilder("PREGUNTAS DISPONIBLES:\n");
+            for (int i = 0; i < preguntas.length; i++) {
+                if (!preguntasUsadas[i]) {
+                    opciones.append((i + 1)).append(". ").append(preguntas[i]).append("\n");
+                }
+            }
+            opciones.append("0. Ver imagen nuevamente\n");
+            opciones.append("9. Volver al menú principal");
+
+            String eleccionStr = JOptionPane.showInputDialog(opciones.toString());
+            if (eleccionStr == null) return; // Cancelar sale del juego
+            int eleccion;
+            try {
+                eleccion = Integer.parseInt(eleccionStr);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Ingresá un número válido.");
+                continue;
+            }
+
+            if (eleccion == 0) {
+                mostrarImagen();
+                continue;
+            }
+            if (eleccion == 9) {
+                // Volver al menú principal
+                return;
+            }
+
+            if (eleccion < 1 || eleccion > preguntas.length || preguntasUsadas[eleccion - 1]) {
+                JOptionPane.showMessageDialog(null, "Opción inválida o ya usada.");
+                continue;
+            }
+
+            preguntasUsadas[eleccion - 1] = true;
+
+            String respuesta = JOptionPane.showInputDialog("Tu personaje " + preguntas[eleccion - 1] + " (si/no):");
+            if (respuesta == null) return;
+            respuesta = respuesta.trim().toLowerCase();
+
+            if (!(respuesta.equals("si") || respuesta.equals("no"))) {
+                JOptionPane.showMessageDialog(null, "Respuesta inválida, escribí 'si' o 'no'.");
+                preguntasUsadas[eleccion - 1] = false; // permitir repetir la pregunta
+                continue;
+            }
+
+            for (int i = 0; i < personajes.length; i++) {
+                if (posibles[i] && !caracteristicas[i][eleccion - 1].equals(respuesta)) {
+                    posibles[i] = false;
+                }
+            }
+
+            preguntasHechas++;
+
+            if (contarPosibles(posibles) == 1) {
+                JOptionPane.showMessageDialog(null, "¡Solo queda un personaje posible!");
+                break;
+            }
+
+        } while (preguntasHechas < 3);
+
+       
+        StringBuilder candidatos = new StringBuilder("Personajes posibles:\n");
+        for (int i = 0; i < personajes.length; i++) {
+            if (posibles[i]) candidatos.append("- ").append(personajes[i]).append("\n");
+        }
+
+        String respuesta = JOptionPane.showInputDialog(candidatos.toString() + "\n¿Quién creés que es? (o escribí 'salir' para volver al menú)");
+        if (respuesta == null || respuesta.equalsIgnoreCase("salir")) return;
+
+        if (respuesta.equalsIgnoreCase(personajes[personajeElegido])) {
+            JOptionPane.showMessageDialog(null, "¡Correcto! Era " + personajes[personajeElegido]);
+            aciertos++;
+        } else {
+            JOptionPane.showMessageDialog(null, "Incorrecto. Era " + personajes[personajeElegido]);
+        }
+    }
+
+    public static int contarPosibles(boolean[] posibles) {
+        int count = 0;
+        for (boolean b : posibles) {
+            if (b) count++;
+        }
+        return count;
+    }
+
+    public static void mostrarImagen() {
+        
+        JFrame frame = new JFrame("Personajes");
+        frame.setSize(750, 550);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+
+        ImageIcon imagen = new ImageIcon("/resources/imgFinal.png");
+        JLabel label = new JLabel(imagen);
+
+        JButton cerrar = new JButton("Cerrar");
+        cerrar.addActionListener(e -> frame.dispose());
+
+        frame.setLayout(new BorderLayout());
+        frame.add(label, BorderLayout.CENTER);
+        frame.add(cerrar, BorderLayout.SOUTH);
+
+        frame.setVisible(true);
+    }
+}
+
