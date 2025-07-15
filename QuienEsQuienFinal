@@ -1,7 +1,6 @@
 package pepe;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class QuienEsQuienFinal {
 
@@ -39,7 +38,7 @@ public class QuienEsQuienFinal {
                             + "3. Salir\n"
                             + "\nElegí una opción:");
 
-            if (opcionStr == null) break; // Cancelar sale del juego
+            if (opcionStr == null) break;
             int opcion;
             try {
                 opcion = Integer.parseInt(opcionStr);
@@ -88,17 +87,17 @@ public class QuienEsQuienFinal {
         mostrarImagen();
 
         do {
-            StringBuilder opciones = new StringBuilder("PREGUNTAS DISPONIBLES:\n");
+            String opciones = "PREGUNTAS DISPONIBLES:\n";
             for (int i = 0; i < preguntas.length; i++) {
                 if (!preguntasUsadas[i]) {
-                    opciones.append((i + 1)).append(". ").append(preguntas[i]).append("\n");
+                    opciones += (i + 1) + ". " + preguntas[i] + "\n";
                 }
             }
-            opciones.append("0. Ver imagen nuevamente\n");
-            opciones.append("9. Volver al menú principal");
+            opciones += "0. Ver imagen nuevamente\n";
+            opciones += "9. Volver al menú principal";
 
-            String eleccionStr = JOptionPane.showInputDialog(opciones.toString());
-            if (eleccionStr == null) return; // Cancelar sale del juego
+            String eleccionStr = JOptionPane.showInputDialog(opciones);
+            if (eleccionStr == null) return;
             int eleccion;
             try {
                 eleccion = Integer.parseInt(eleccionStr);
@@ -112,7 +111,6 @@ public class QuienEsQuienFinal {
                 continue;
             }
             if (eleccion == 9) {
-                // Volver al menú principal
                 return;
             }
 
@@ -129,7 +127,7 @@ public class QuienEsQuienFinal {
 
             if (!(respuesta.equals("si") || respuesta.equals("no"))) {
                 JOptionPane.showMessageDialog(null, "Respuesta inválida, escribí 'si' o 'no'.");
-                preguntasUsadas[eleccion - 1] = false; // permitir repetir la pregunta
+                preguntasUsadas[eleccion - 1] = false;
                 continue;
             }
 
@@ -148,13 +146,12 @@ public class QuienEsQuienFinal {
 
         } while (preguntasHechas < 3);
 
-       
-        StringBuilder candidatos = new StringBuilder("Personajes posibles:\n");
+        String candidatos = "Personajes posibles:\n";
         for (int i = 0; i < personajes.length; i++) {
-            if (posibles[i]) candidatos.append("- ").append(personajes[i]).append("\n");
+            if (posibles[i]) candidatos += "- " + personajes[i] + "\n";
         }
 
-        String respuesta = JOptionPane.showInputDialog(candidatos.toString() + "\n¿Quién creés que es? (o escribí 'salir' para volver al menú)");
+        String respuesta = JOptionPane.showInputDialog(candidatos + "\n¿Quién creés que es? (o escribí 'salir' para volver al menú)");
         if (respuesta == null || respuesta.equalsIgnoreCase("salir")) return;
 
         if (respuesta.equalsIgnoreCase(personajes[personajeElegido])) {
@@ -174,23 +171,8 @@ public class QuienEsQuienFinal {
     }
 
     public static void mostrarImagen() {
-        
-        JFrame frame = new JFrame("Personajes");
-        frame.setSize(750, 550);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-
-        ImageIcon imagen = new ImageIcon("/resources/imgFinal.png");
-        JLabel label = new JLabel(imagen);
-
-        JButton cerrar = new JButton("Cerrar");
-        cerrar.addActionListener(e -> frame.dispose());
-
-        frame.setLayout(new BorderLayout());
-        frame.add(label, BorderLayout.CENTER);
-        frame.add(cerrar, BorderLayout.SOUTH);
-
-        frame.setVisible(true);
+        ImageIcon imagen = new ImageIcon("resources/imgFinal.png");
+        JOptionPane.showMessageDialog(null, "", "Personajes", JOptionPane.INFORMATION_MESSAGE, imagen);
     }
 }
 
